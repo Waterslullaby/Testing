@@ -1,0 +1,71 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class EnemyHealth : MonoBehaviour {
+
+    public float HP;
+	private CharacterController2D Cont;
+	public Vector2 bounce; 
+	private Vector2 currentPos;
+	private CharacterController2D Enemy;
+	float scaledHealth; //scaled health = current health / max health
+
+	public GameObject enemyHealthBar; 
+	public float maxHealth;
+
+
+	public void Start() {
+		bounce.x = 10;
+		HP = 10;
+		scaledHealth = HP / maxHealth;
+		Cont = gameObject.GetComponent<CharacterController2D>();
+
+	}
+	
+	void Update () {
+		
+		
+	}
+
+	public void OnTriggerEnter2D(Collider2D other)
+	{
+		if(other.CompareTag("Weapon") || other.CompareTag("PlayerProjectile"))
+		{
+
+			if((transform.position.x - other.transform.position.x) < 0)
+			{
+ 				bounce.x = -3;
+			}
+			else
+			{
+				bounce.x = 3;
+			}
+			try
+			{
+				Cont.AddForce(bounce);
+				Cont.SetHorizontalForce(0);
+			} catch{}
+			HP -= other.gameObject.GetComponent<Weapons>().GetWeaponDamage();
+
+
+			setEnemyHealth ();
+			Debug.Log ("OW");
+
+			if(HP == 0)
+			{
+				gameObject.SetActive(false);
+
+			}
+		}
+	}
+
+	public void setEnemyHealth()
+	{
+		scaledHealth = HP / maxHealth;
+		enemyHealthBar.transform.localScale = new Vector2 (scaledHealth, enemyHealthBar.transform.localScale.y);
+	}
+
+
+}
