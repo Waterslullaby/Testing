@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class EnemyHealth : MonoBehaviour {
 
-    public float HP;
+	public float HP;
 	private CharacterController2D Cont;
 	public Vector2 bounce; 
 	private Vector2 currentPos;
@@ -15,12 +15,17 @@ public class EnemyHealth : MonoBehaviour {
 	public GameObject enemyHealthBar; 
 	public float maxHealth;
 
+	private GameObject mpotPrefab;
+	private Rigidbody2D mPot;
+
 
 	public void Start() {
 		bounce.x = 10;
-		HP = 10;
+		maxHealth = 10;
+		HP = maxHealth;
 		scaledHealth = HP / maxHealth;
 		Cont = gameObject.GetComponent<CharacterController2D>();
+
 
 	}
 	
@@ -47,7 +52,8 @@ public class EnemyHealth : MonoBehaviour {
 				Cont.AddForce(bounce);
 				Cont.SetHorizontalForce(0);
 			} catch{}
-			HP -= other.gameObject.GetComponent<Weapons>().GetWeaponDamage();
+			HP -= other.gameObject.GetComponent<Weapons>().GetWeaponDamage(); 
+
 
 
 			setEnemyHealth ();
@@ -55,7 +61,13 @@ public class EnemyHealth : MonoBehaviour {
 
 			if(HP == 0)
 			{
-				gameObject.SetActive(false);
+				if (Random.value >= .7) { //there's a 30% chance that it'll drop a health pot
+					mpotPrefab = Resources.Load ("ManaPot") as GameObject;
+					Rigidbody2D mPot = (Rigidbody2D)Instantiate (mpotPrefab.GetComponent<Rigidbody2D> (), new Vector2 (transform.position.x, transform.position.y), transform.rotation); // manapot spawns at dead monster's position
+					mPot.GetComponent<Rigidbody2D> ().velocity = (new Vector2(Random.Range(-1, 1), Random.Range(-1, 1)) - (Vector2)transform.position) * 3; // mana pot now has a random velocity
+				}
+
+				gameObject.SetActive(false); // monster set as inactive. cannot be interacted with.
 
 			}
 		}
@@ -69,3 +81,5 @@ public class EnemyHealth : MonoBehaviour {
 
 
 }
+
+
